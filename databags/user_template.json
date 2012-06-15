@@ -3,8 +3,6 @@
         "customer_name" : "My Demo Customer",
         "demos" : [
         {
-                "configuration": [
-                { 
                         "name" : "demo1",
                         "public_dns" : "http://test.test.test",
                         "public_ip" : "6.6.6.6",
@@ -27,7 +25,7 @@
 
                           ]
                           }
-        ]}]
+        ]
 }
 
                                   
