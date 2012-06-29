@@ -4,27 +4,11 @@
         "demos" : [
         {
                         "name" : "demo1",
-                        "public_dns" : "http://test.test.test",
+                        "public_url" : "http://test.test.test",
                         "public_ip" : "6.6.6.6",
                         "private_ip" : "7.7.7.7",
-                        "servers" : [
-                          { 
-                                  "name" : "app",
-                                  "data_url" : "http://dropbox",
-                                  "type" : "application",
-                                  "public_ip" :  "1.2.3.4",
-                                  "private_ip" :  "2.3.4.5"
-                          },
-                          {
-                                  "name" : "mydb",
-                                  "data_url" : "http://go.go",
-                                  "type" : "database",
-                                  "public_ip" : null,
-                                  "private_ip" : "1.2.3.4"
-                          }
-
-                          ]
-                          }
+                        "servers" : []
+                  }
         ]
 }
 
