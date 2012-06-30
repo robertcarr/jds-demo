@@ -17,6 +17,9 @@
 # limitations under the License.
 #
 
+puts node['customer_data'].inspect
+
+
 package "memcached" do
   action :upgrade
 end

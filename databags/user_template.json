@@ -1,15 +1,15 @@
 {
         "id" : "demo",
         "customer_name" : "My Demo Customer",
-        "demos" : [
-        {
-                        "name" : "demo1",
-                        "public_url" : "http://test.test.test",
-                        "public_ip" : "6.6.6.6",
-                        "private_ip" : "7.7.7.7",
-                        "servers" : []
-                  }
-        ]
+        "demos" : [ {
+                "name" : "demoabc",
+                "public_url" : "http",
+                "public_ips" : "1.2.3.4",
+                "private_ips": "1.2.3.4",
+                "public_dns" : "abcd.com",
+                "servers" : []
+                
+                  }]
 }
 
                                   

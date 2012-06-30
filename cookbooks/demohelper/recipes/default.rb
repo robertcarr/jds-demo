@@ -6,6 +6,7 @@
 #
 # All rights reserved - Do Not Redistribute
 #
+# Read userdata passed to the VM is used to retrieve and set data bags on the hosted chef server.
 
 params = Hash.new
 
@@ -20,8 +21,6 @@ cloud_data['userdata'] = ohai_data['ec2']['userdata']
   end
 end
 
-puts params.inspect
-
 cloud_data.merge!({'server_role'=>params['server_role'], 'launched' => Time.now })
 
 begin
@@ -35,9 +34,41 @@ end
 
 unless customer_data.nil? || cloud_data.nil? 
   customer_data['demos'].each do |demo|
-    if demo['name'] == params['demo_name'] then
+if demo['name'] == params['demo_name'] then
             demo['servers'] << cloud_data
     end
     customer_data.save
   end
 end
+
+
+
+
+# Read the entire data bag for this demo and create node variables that 
+# can be helpful to the recipes that follow.
+
+customer_data = data_bag_item(params['userid'], "demo")
+
+@nodeinfo = Hash.new{|h,k| h[k]=[] }
+
+customer_data['demos'].each do |demo|
+  if demo['name'] == params['demo_name']
+    demo['servers'].each do |server|
+    @nodeinfo[server['server_role']]  << server
+    end
+  end
+end
+
+def attributes_by_role(role, attrib)
+items = []
+ @nodeinfo[role].each do |server|
+   items << server[attrib]
+ end
+ items
+end
+
+node.set['demo'] = params['demo_name']
+node.set['server_role'] = params['server_role']
+node.set[params['server_role']] = { 'private_ips' => attributes_by_role(params['server_role'], 'private_ips') }
+
+
