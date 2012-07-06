@@ -1,12 +1,16 @@
 {
 
-"id" : "jds",
-"demos" : [
+"name" : "jds",
+"default_attributes" : {
+
+        "demos" : [
     {
             "code" : "abcd123",
             "name" : "demo1",
             "description" : "desc",
-            "data_url" : "http:test.test.com"
+            "data_url" : "http:test.test.com",
+            "app_url" : "http://app.url"
     }
 ]
+}
 }

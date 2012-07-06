@@ -47,6 +47,8 @@ end
 # Read the entire data bag for this demo and create node variables that 
 # can be helpful to the recipes that follow.
 
+# TODO(ROB): move to library?
+
 customer_data = data_bag_item(params['userid'], "demo")
 
 @nodeinfo = Hash.new{|h,k| h[k]=[] }
@@ -60,15 +62,20 @@ customer_data['demos'].each do |demo|
 end
 
 def attributes_by_role(role, attrib)
-items = []
+items = Array.new
  @nodeinfo[role].each do |server|
    items << server[attrib]
  end
  items
 end
 
+h= Hash.new{ |h,k| h[k]=[] }
 node.set['demo'] = params['demo_name']
 node.set['server_role'] = params['server_role']
-node.set[params['server_role']] = { 'private_ips' => attributes_by_role(params['server_role'], 'private_ips') }
 
+@nodeinfo.each_key do |role|
+  %w[ private_ips public_ips name server_role public_hostname local_hostname ].each do |attrib|
+    node.set["#{role}"]["#{attrib}"] = attributes_by_role(role, attrib)
+  end
+end
 
