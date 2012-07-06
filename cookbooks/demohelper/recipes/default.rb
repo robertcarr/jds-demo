@@ -56,11 +56,9 @@ end
 # can be helpful to the recipes that follow.
 
 # TODO(ROB): move to library?
-
 customer_data = data_bag_item(dbag_name, "demo")
 
 @nodeinfo = Hash.new{|h,k| h[k]=[] }
-
 customer_data['servers'].each do |server|
     @nodeinfo[server['server_role']]  << server
   end
@@ -73,7 +71,9 @@ items = Array.new
  items
 end
 
-h= Hash.new{ |h,k| h[k]=[] }
+
+# Create node attributes that will persist to the recipes that follow this one.  This makes it easier & faster for the other other recipes to know about their 
+# environment without having to query the chef server.
 node.set['demo'] = demo_name
 node.set['server_role'] = server_role
 
@@ -82,4 +82,3 @@ node.set['server_role'] = server_role
     node.set["#{role}"]["#{attrib}"] = attributes_by_role(role, attrib)
   end
 end
-
