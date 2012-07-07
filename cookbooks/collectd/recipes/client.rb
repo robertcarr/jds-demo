@@ -19,10 +19,10 @@
 
 include_recipe "collectd"
 
-servers = []
-search(:node, 'recipes:"collectd::server"') do |n|
-  servers << n['fqdn']
-end
+servers = node.monitoring.private_ips.flatten()
+#search(:node, 'recipes:"collectd::server"') do |n|
+#  servers << n['fqdn']
+#end
 
 if servers.empty?
   raise "No servers found. Please configure at least one node with collectd::server."
@@ -31,3 +31,12 @@ end
 collectd_plugin "network" do
   options :server=>servers
 end
+
+collectd_plugin "interface" do
+  options :interface=>"eth0"
+end
+
+collectd_plugin "cpu"
+collectd_plugin "memory"
+collectd_plugin "disk"
+
