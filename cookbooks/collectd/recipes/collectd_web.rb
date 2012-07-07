@@ -26,6 +26,10 @@ directory node[:collectd][:collectd_web][:path] do
   mode "755"
 end
 
+%w[ librrds-perl libjson-perl ].each do |p|
+package p 
+end
+
 bash "install_collectd_web" do
   user "root"
   cwd node[:collectd][:collectd_web][:path]
@@ -45,5 +49,10 @@ template "/etc/apache2/sites-available/collectd_web.conf" do
   group "root"
   mode "644"
 end
+
+apache_site "default" do
+  enable false
+end
+
 
 apache_site "collectd_web.conf"

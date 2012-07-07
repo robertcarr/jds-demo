@@ -19,7 +19,7 @@
 
 include_recipe "collectd"
 
-servers = Array.new([node.monitoring.local_ipv4])
+servers = node.monitoring.private_ips.flatten()
 #search(:node, 'recipes:"collectd::server"') do |n|
 #  servers << n['fqdn']
 #end
@@ -31,3 +31,12 @@ end
 collectd_plugin "network" do
   options :server=>servers
 end
+
+collectd_plugin "interface" do
+  options :interface=>"eth0"
+end
+
+collectd_plugin "cpu"
+collectd_plugin "memory"
+collectd_plugin "disk"
+
