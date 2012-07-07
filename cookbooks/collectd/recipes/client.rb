@@ -19,10 +19,10 @@
 
 include_recipe "collectd"
 
-servers = []
-search(:node, 'recipes:"collectd::server"') do |n|
-  servers << n['fqdn']
-end
+servers = Array.new([node.monitoring.local_ipv4])
+#search(:node, 'recipes:"collectd::server"') do |n|
+#  servers << n['fqdn']
+#end
 
 if servers.empty?
   raise "No servers found. Please configure at least one node with collectd::server."
