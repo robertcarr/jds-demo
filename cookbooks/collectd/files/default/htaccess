@@ -1,0 +1,4 @@
+AuthUserFile /srv/collectd_web/.htpasswd
+AuthName "Authorization Required"
+AuthType Basic
+require valid-user

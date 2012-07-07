@@ -25,3 +25,5 @@ default[:collectd][:read_threads] = 5
 
 default[:collectd][:collectd_web][:path] = "/srv/collectd_web"
 default[:collectd][:collectd_web][:hostname] = "collectd"
+default[:collectd][:collectd_web][:htpasswd] = "scalemore!"
+

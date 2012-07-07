@@ -43,16 +43,51 @@ bash "install_collectd_web" do
   EOH
 end
 
-template "/etc/apache2/sites-available/collectd_web.conf" do
-  source "collectd_web.conf.erb"
+template "/srv/collectd_web" do
+  source "index.html.erb"
   owner "root"
   group "root"
-  mode "644"
+  mode  "0644"
 end
+
+cookbook_file "/srv/collectd_web/index.html" do
+  source "index.html"
+  mode "0644"
+  owner "root"
+  group "root"
+end
+
+cookbook_file "/srv/collectd_web/media/images/rotator-small.png" do
+  source "rotator-small.png"
+  mode "0644"
+  owner "0644"
+  group "root"
+end
+
+cookbook_file "/srv/collectd_web/.htaccess" do 
+  source "htaccess"
+  mode "0644"
+  owner "root"
+  group "root"
+end
+
+bash "added .htaccess file" do
+  user "root"
+  code <<-EOH
+  htpasswd -bc /srv/collectd_web/.htpasswd cs "#{node[:collectd][:collectd_web][:htpasswd]}"
+  EOH
+end
+
 
 apache_site "default" do
   enable false
 end
 
+bash "allow overrides" do
+  user "root"
+  code <<-EOH
+  sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/sites-enabled/collectd_web.conf
+  EOH
+end
 
 apache_site "collectd_web.conf"
