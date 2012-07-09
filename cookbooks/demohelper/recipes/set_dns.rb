@@ -31,12 +31,12 @@ block  do
     public_ip = node.cloud.public_ipv4
     record =  dme.get(recordname)
 # If nil then create a new DNS entry.
-    if record.nil? || node.server_role == 'lb'
+    if record.nil? || node.server_role == 'lb' then
       record = { :name => recordname, :data => public_ip, :type => 'A', :ttl => '120' }
       dme.create(record)
     else
-      record[:data] = public_ip
-      domain.update(record[:id],record)
+      record['data'] = public_ip
+      dme.update(record['id'],record)
     end
   end
 end # block do
