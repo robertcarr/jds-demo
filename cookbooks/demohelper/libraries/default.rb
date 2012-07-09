@@ -1,5 +1,6 @@
 module DNS
 require 'openssl'
+require 'time'
   class DME
     def initialize(apikey, secretkey)
       @secretkey = secretkey
@@ -9,7 +10,7 @@ require 'openssl'
     end
 
     def hmac
-      OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA1.new, @secretkey, httpdate)
+      OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA1.new, @secretkey, Time.now.httpdate)
     end
     def secretkey(key)
       @secretkey = key
@@ -28,13 +29,10 @@ require 'openssl'
     end
     def endpoint(url)
       @endpoint = url
-    def httpdate
-      t = Time.now
-      t.gmtime.strftime("%a, %d %b %Y %H:%M:%S %Z")
     end
     def standardHeaders
       headers = Hash.new
-      headers = { :apikey => "x-dnsme-apiKey:#{@apikey}", :date => "x-dnsme-requestDate:#{httpdate}", :hmac => "x-dnsme-hmac:#{hmac}" }
+      headers = { :apikey => "x-dnsme-apiKey:#{@apikey}", :date => "x-dnsme-requestDate:#{Time.now.httpdate}", :hmac => "x-dnsme-hmac:#{hmac}" }
     end
     def record_add(h)
       headers = standardHeaders
@@ -44,7 +42,7 @@ require 'openssl'
       #puts request
       `curl #{request}`
     end
-    def send(*q)
+    def get(*q)
       query = q[0] || 'domains/jdsdemo.com/records'
       headers = standardHeaders
       request = "#{@endpoint}/#{query} --header '#{headers[:apikey]}' --header '#{headers[:date]}' --header '#{headers[:hmac]}'"

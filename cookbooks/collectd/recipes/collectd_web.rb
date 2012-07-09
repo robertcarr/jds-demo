@@ -43,8 +43,8 @@ bash "install_collectd_web" do
   EOH
 end
 
-template "/srv/collectd_web" do
-  source "index.html.erb"
+template "/etc/apache2/sites-available/collectd_web.conf" do
+  source "collectd_web.conf.erb"
   owner "root"
   group "root"
   mode  "0644"
@@ -60,7 +60,7 @@ end
 cookbook_file "/srv/collectd_web/media/images/rotator-small.png" do
   source "rotator-small.png"
   mode "0644"
-  owner "0644"
+  owner "root"
   group "root"
 end
 
@@ -86,7 +86,7 @@ end
 bash "allow overrides" do
   user "root"
   code <<-EOH
-  sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/sites-enabled/collectd_web.conf
+  sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/sites-available/collectd_web.conf
   EOH
 end
 

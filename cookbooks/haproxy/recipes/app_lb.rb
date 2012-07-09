@@ -19,6 +19,10 @@
 
 #pool_members = search("node", "role:#{node['haproxy']['app_server_role']} AND chef_environment:#{node.chef_environment}") || []
 
+if node.server_name == 'tomcat' then
+  node.set['haproxy']['member_port'] = '8080'
+end
+
 members = node.app.private_ips.flatten() || []
 pool_members = members.map { |member| { :ipaddress => member, :hostname => "app_server_#{rand(1000)}" } }
 
