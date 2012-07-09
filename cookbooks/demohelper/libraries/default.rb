@@ -1,11 +1,11 @@
 module DNS
 require 'openssl'
   class DME
-  @@endpoint = 'http://api.dnsmadeeasy.com/V1.2'
-  #@@endpoint = 'http://api.dnsmadeeasy.com/V2.0'
     def initialize(apikey, secretkey)
       @secretkey = secretkey
       @apikey = apikey
+      @endpoint = 'http://api.dnsmadeeasy.com/V1.2'
+      #@endpoint = 'http://api.dnsmadeeasy.com/V2.0'
     end
 
     def hmac
@@ -24,8 +24,10 @@ require 'openssl'
       @apikey
     end
     def endpoint?
-      @@endpoint
+      @endpoint
     end
+    def endpoint(url)
+      @endpoint = url
     def httpdate
       t = Time.now
       t.gmtime.strftime("%a, %d %b %Y %H:%M:%S %Z")
@@ -38,14 +40,14 @@ require 'openssl'
       headers = standardHeaders
       query = "domains/#{h[:domain]}/records"
       json = %Q_{"name" : "#{h[:name]}", "type" : "#{h[:type]}", "data" :"#{h[:ip]}", "gtdLocation" : "DEFAULT", "ttl" : #{h[:ttl]} }_
-      request = "#{@@endpoint}/#{query} --header '#{headers[:apikey]}' --header '#{headers[:date]}' --header '#{headers[:hmac]}' -X POST -H accept:application/json -H content-type:application/json -d '#{json}'"
+      request = "#{@endpoint}/#{query} --header '#{headers[:apikey]}' --header '#{headers[:date]}' --header '#{headers[:hmac]}' -X POST -H accept:application/json -H content-type:application/json -d '#{json}'"
       #puts request
       `curl #{request}`
     end
     def send(*q)
       query = q[0] || 'domains/jdsdemo.com/records'
       headers = standardHeaders
-      request = "#{@@endpoint}/#{query} --header '#{headers[:apikey]}' --header '#{headers[:date]}' --header '#{headers[:hmac]}'"
+      request = "#{@endpoint}/#{query} --header '#{headers[:apikey]}' --header '#{headers[:date]}' --header '#{headers[:hmac]}'"
       #puts request
       puts "curl #{request}"
       `curl #{request}`

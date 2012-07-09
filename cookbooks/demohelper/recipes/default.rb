@@ -24,7 +24,8 @@ end
 
 demo_name = params['demo_name']
 userid = params['userid']
-server_role = params['server_role']
+server_role = params['server_role'] 
+server_name = params['server_name'] || "notset"
 dbag_name = "tenant_#{userid}_#{demo_name}"
 
 begin
@@ -47,7 +48,7 @@ end
 # to find and connect when they are spun up.
 
 unless customer_data.nil? || cloud_data.nil? 
-  cloud_data.merge!({'server_role'=>server_role, 'launched' => Time.now })
+  cloud_data.merge!({'server_name' => server_name, 'server_role'=>server_role, 'launched' => Time.now })
   customer_data['servers'] << cloud_data
   customer_data.save
 end
@@ -76,9 +77,12 @@ end
 # environment without having to query the chef server.
 node.set['demo'] = demo_name
 node.set['server_role'] = server_role
+node.set['userid'] = userid
+node.set['set_dns'] = params['set_dns']
+node.set['server_name'] = server_name
 
 @nodeinfo.each_key do |role|
-  %w[ private_ips public_ips name server_role public_hostname local_hostname ].each do |attrib|
+  %w[ private_ips public_ips name server_role public_hostname local_hostname server_name ].each do |attrib|
     node.set["#{role}"]["#{attrib}"] = attributes_by_role(role, attrib)
   end
 end
