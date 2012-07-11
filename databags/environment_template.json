@@ -1,16 +1,29 @@
+
+
 {
-
-"name" : "jds",
-"default_attributes" : {
-
-        "demos" : [
-    {
-            "code" : "abcd123",
-            "name" : "demo1",
-            "description" : "desc",
-            "data_url" : "http:test.test.com",
-            "app_url" : "http://app.url"
+    "name": "jds",
+    "default_attributes": {
+        "demos": [
+            {
+                "demo_name": "db",
+                "description": "desc",
+                "db_url": "http:test.test.com",
+                "app_url": "http://app.url",
+                "roles": [
+                    {
+                        "role": "monitoring",
+                        "type": "monitoring",
+                        "name": "Server1",
+                        "set_dns": "true"
+                    },
+                    {
+                        "role": "mysql",
+                        "type": "db",
+                        "name": "mysql",
+                        "set_dns": "true"
+                    }
+                ]
+            }
+        ]
     }
-]
-}
 }

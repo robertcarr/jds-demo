@@ -18,7 +18,7 @@
 #
 
 include_recipe "apache2"
-#include_recipe "mysql::server"
+include_recipe "mysql::server"
 include_recipe "php"
 include_recipe "php::module_mysql"
 include_recipe "apache2::mod_php5"
@@ -37,30 +37,16 @@ else
   server_fqdn = node['fqdn']
 end
 
-node.set['wordpress']['db']['password'] = secure_password
-node.set['wordpress']['keys']['auth'] = secure_password
-node.set['wordpress']['keys']['secure_auth'] = secure_password
-node.set['wordpress']['keys']['logged_in'] = secure_password
-node.set['wordpress']['keys']['nonce'] = secure_password
+node.set_unless['wordpress']['db']['password'] = secure_password
+node.set_unless['wordpress']['keys']['auth'] = secure_password
+node.set_unless['wordpress']['keys']['secure_auth'] = secure_password
+node.set_unless['wordpress']['keys']['logged_in'] = secure_password
+node.set_unless['wordpress']['keys']['nonce'] = secure_password
 
 
-if node['wordpress']['version'] == 'latest'
-  # WordPress.org does not provide a sha256 checksum, so we'll use the sha1 they do provide
-  require 'digest/sha1'
-  require 'open-uri'
-  local_file = "#{Chef::Config[:file_cache_path]}/wordpress-latest.tar.gz"
-  latest_sha1 = open('http://wordpress.org/latest.tar.gz.sha1') {|f| f.read }
-  unless File.exists?(local_file) && ( Digest::SHA1.hexdigest(File.read(local_file)) == latest_sha1 )
-    remote_file "#{Chef::Config[:file_cache_path]}/wordpress-latest.tar.gz" do
-      source "http://wordpress.org/latest.tar.gz"
-      mode "0644"
-    end
-  end
-else
-  remote_file "#{Chef::Config[:file_cache_path]}/wordpress-#{node['wordpress']['version']}.tar.gz" do
-    source "http://wordpress.org/wordpress-#{node['wordpress']['version']}.tar.gz"
-    mode "0644"
-  end
+cookbook_file "/tmp/wordpress-latest.tar.gz" do 
+  source "wordpress-latest.tar.gz"
+  mode "0644"
 end
 
 directory "#{node['wordpress']['dir']}" do
@@ -71,10 +57,11 @@ directory "#{node['wordpress']['dir']}" do
   recursive true
 end
 
-execute "untar-wordpress" do
-  cwd node['wordpress']['dir']
-  command "tar --strip-components 1 -xzf #{Chef::Config[:file_cache_path]}/wordpress-#{node['wordpress']['version']}.tar.gz"
-  creates "#{node['wordpress']['dir']}/wp-settings.php"
+bash "untar wordpress" do
+  code <<-EOH
+  cd /tmp
+  tar zxvf wordpress-latest.tar.gz -C /var/www/wordpress
+  EOH
 end
 
 #execute "mysql-install-wp-privileges" do
@@ -107,20 +94,20 @@ end
 #  end
 #  notifies :create, "ruby_block[save node data]", :immediately unless Chef::Config[:solo]
 #end
-#
-# save node data after writing the MYSQL root password, so that a failed chef-client run that gets this far doesn't cause an unknown password to get applied to the box without being saved in the node data.
-unless Chef::Config[:solo]
-  ruby_block "save node data" do
-    block do
-      node.save
-    end
-    action :create
-  end
-end
 
-log "Navigate to 'http://#{server_fqdn}/wp-admin/install.php' to complete wordpress installation" do
-  action :nothing
-end
+# save node data after writing the MYSQL root password, so that a failed chef-client run that gets this far doesn't cause an unknown password to get applied to the box without being saved in the node data.
+#unless Chef::Config[:solo]
+#  ruby_block "save node data" do
+#    block do
+#      node.save
+#    end
+#    action :create
+#  end
+#end
+#
+#log "Navigate to 'http://#{server_fqdn}/wp-admin/install.php' to complete wordpress installation" do
+#  action :nothing
+#end
 
 template "#{node['wordpress']['dir']}/wp-config.php" do
   source "wp-config.php.erb"
@@ -128,6 +115,7 @@ template "#{node['wordpress']['dir']}/wp-config.php" do
   group "root"
   mode "0644"
   variables(
+    :db              => node.db.private_ips.flatten[0],
     :database        => node['wordpress']['db']['database'],
     :user            => node['wordpress']['db']['user'],
     :password        => node['wordpress']['db']['password'],
@@ -136,7 +124,7 @@ template "#{node['wordpress']['dir']}/wp-config.php" do
     :logged_in_key   => node['wordpress']['keys']['logged_in'],
     :nonce_key       => node['wordpress']['keys']['nonce']
   )
-  notifies :write #, "log[Navigate to 'http://#{server_fqdn}/wp-admin/install.php' to complete wordpress installation]"
+  #notifies :write, "log[Navigate to 'http://#{server_fqdn}/wp-admin/install.php' to complete wordpress installation]"
 end
 
 apache_site "000-default" do

@@ -18,7 +18,7 @@
 #
 
 include_recipe "collectd"
-
+if node.attribute?("monitoring") then
 servers = node.monitoring.private_ips.flatten()
 #search(:node, 'recipes:"collectd::server"') do |n|
 #  servers << n['fqdn']
@@ -39,4 +39,5 @@ end
 collectd_plugin "cpu"
 collectd_plugin "memory"
 collectd_plugin "disk"
+end
 

@@ -1,5 +1,5 @@
-GRANT ALL ON <%= @database %>.* TO '<%= @user %>'@'%' IDENTIFIED BY '<%= @password %>';
-GRANT ALL ON <%= @database %>.* TO '<%= @user %>'@'<%= node['fqdn'] %>' IDENTIFIED BY '<%= @password %>';
-GRANT ALL ON <%= @database %>.* TO '<%= @user %>'@'localhost' IDENTIFIED BY '<%= @password %>';
+GRANT ALL ON wordpressdb.* TO 'wordpressuser'@'%' IDENTIFIED BY '<%= @password %>';
+GRANT ALL ON wordpressdb.* TO 'wordpressuser'@'<%= node['fqdn'] %>' IDENTIFIED BY '<%= @password %>';
+GRANT ALL ON wordpressdb.* TO 'wordpressuser'@'localhost' IDENTIFIED BY '<%= @password %>';
 
 FLUSH PRIVILEGES;
