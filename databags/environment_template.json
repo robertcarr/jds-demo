@@ -5,10 +5,64 @@
     "default_attributes": {
         "demos": [
             {
-                "demo_name": "db",
-                "description": "desc",
+                "demo_name": "wordpress",
+                "description": "Three-tier Wordpress demo with monitoring, LB and Database",
                 "db_url": "http:test.test.com",
                 "app_url": "http://app.url",
+                "security_group": "default",
+                "ssh_key": "chef",
+                "image_id": "ami-35c31a5c",
+                "machine_size": "m1.large",
+                "login_user": "ubuntu",
+                "roles": [
+                    {
+                        "role": "monitoring",
+                        "type": "monitoring",
+                        "name": "collectd",
+                        "set_dns": "true"
+                    },
+                    {
+                        "role": "wordpressdb",
+                        "type": "db",
+                        "name": "mysql",
+                        "set_dns": "true"
+                    },
+                    {
+                        "role": "wordpress",
+                        "type": "app",
+                        "name": "wp",
+                        "set_dns": "false"
+                    },
+                    {
+                        "role": "wordpress",
+                        "type": "app",
+                        "name": "wp",
+                        "set_dns": "false"
+                    },
+                    {
+                        "role": "wordpress",
+                        "type": "app",
+                        "name": "wp",
+                        "set_dns": "false"
+                    },
+                    {
+                        "role": "loadbalancer",
+                        "type": "lb",
+                        "name": "lb",
+                        "set_dns": "true"
+                    }
+                ]
+            },
+            {
+                "demo_name": "db",
+                "description": "MySQL Database with PHPMyAdmin and Monitoring",
+                "db_url": "http:test.test.com",
+                "app_url": "http://app.url",
+                "security_group": "default",
+                "ssh_key": "chef",
+                "image_id": "ami-35c31a5c",
+                "machine_size": "m1.large",
+                "login_user": "ubuntu",
                 "roles": [
                     {
                         "role": "monitoring",
@@ -23,7 +77,37 @@
                         "set_dns": "true"
                     }
                 ]
+            },
+
+{
+                "demo_name": "memcache",
+                "description": "standalone memcache server",
+                "db_url": "http:test.test.com",
+                "app_url": "http://app.url",
+                "security_group": "default",
+                "ssh_key": "chef",
+                "image_id": "ami-35c31a5c",
+                "machine_size": "m1.large",
+                "login_user": "ubuntu",
+                "roles": [
+                    {
+                        "role": "monitoring",
+                        "type": "monitoring",
+                        "name": "Server1",
+                        "set_dns": "true"
+                    },
+                    {
+                        "role": "memcache",
+                        "type": "app",
+                        "name": "memcache",
+                        "set_dns": "false"
+                    }
+                ]
             }
+
+
+
+
         ]
     }
 }

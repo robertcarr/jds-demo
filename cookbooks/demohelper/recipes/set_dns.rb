@@ -8,6 +8,7 @@
 #
 # Read userdata passed to the VM is used to retrieve and set data bags on the hosted chef server.
 
+# Make sure our custom GEM is preloaded for the recipe
 g = cookbook_file "/tmp/dme-api-0.1.2.gem" do
   source "dme-api-0.1.2.gem"
   mode "0644"
@@ -23,9 +24,10 @@ g.run_action(:install)
 Gem.clear_paths
 require 'dme-api'
 
+# Add/Upate DNS records to DNSMadeEasy as VM's start up.
 ruby_block "Update DNS" do
 block  do
-  if node.set_dns then
+  if node.set_dns == 'true'  then
     dme = DME.new(node[:dme][:apikey],node[:dme][:secretkey],node[:dme][:domain])
     case node.server_role
       when 'lb'

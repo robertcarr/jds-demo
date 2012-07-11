@@ -14,20 +14,16 @@ params = Hash.new
 ohai_data = node.current_automatic
 cloud_data = ohai_data['cloud']
 
+# Need to check for OpenStack later.
 unless ohai_data['ec2']['userdata'].nil? then
 cloud_data['userdata'] = ohai_data['ec2']['userdata']
     cloud_data['userdata'].split("&").each do |item|
     item = item.split("=")
-    params[item[0]] = item[1].chomp
+    config[item[0].to_sym] = item[1].chomp
   end
 end
 
-demo_name = params['demo_name']
-userid = params['userid']
-server_role = params['server_role'] 
-server_name = params['server_name'] || "notset"
-dbag_name = "tenant_#{userid}_#{demo_name}"
-set_dns = params['set_dns']
+dbag_name = "tenant_#{config[:userid]}_#{config[:demo_name]}"
 
 begin
 # Need to grab the demo from userdata or file
@@ -44,17 +40,15 @@ dbag.save
 customer_data = data_bag_item(dbag_name, "demo")
 end
 
-# Update the databags with the relvant network information.  This will allow the other services
-# to find and connect when they are spun up.
+# Save the databags with the updated information.
 unless customer_data.nil? || cloud_data.nil? 
-  cloud_data.merge!({'server_name' => server_name, 'server_role'=>server_role, 'launched' => Time.now })
+  cloud_data.merge!({'server_name' => config[:server_name], 'server_role'=>config[:server_role], 'launched' => Time.now })
   customer_data['servers'] << cloud_data
   customer_data.save
 end
 
 # Read the entire data bag for this demo and create node variables that 
 # can be helpful to the recipes that follow.
-
 # TODO(ROB): move to library?
 customer_data = data_bag_item(dbag_name, "demo")
 
