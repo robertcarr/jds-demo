@@ -13,6 +13,7 @@ params = Hash.new
 
 ohai_data = node.current_automatic
 cloud_data = ohai_data['cloud']
+config = {}
 
 # Need to check for OpenStack later.
 unless ohai_data['ec2']['userdata'].nil? then
@@ -67,10 +68,10 @@ end
 
 # Create node attributes that will persist to the recipes that follow this one.  This makes it easier & faster for the other other recipes to know about their 
 # environment without having to query the chef server.
-%w[ demo_name server_role userid set_dns server_name ].each { |x| eval("node.set[x] = eval(x)") }
+%w[ demo_name server_role userid set_dns server_name type ].each { |x| node.set["#{x}"] = config[x.to_sym] }
 
 @nodeinfo.each_key do |role|
-  %w[ private_ips public_ips name server_role public_hostname local_hostname server_name ].each do |attrib|
+  %w[ private_ips public_ips name server_role public_hostname local_hostname server_name type ].each do |attrib|
     node.set["#{role}"]["#{attrib}"] = attributes_by_role(role, attrib)
   end
 end

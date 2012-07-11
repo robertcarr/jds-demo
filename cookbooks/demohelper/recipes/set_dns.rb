@@ -29,17 +29,17 @@ ruby_block "Update DNS" do
 block  do
   if node.set_dns == 'true'  then
     dme = DME.new(node[:dme][:apikey],node[:dme][:secretkey],node[:dme][:domain])
-    case node.server_role
-      when 'lb'
+    case node.type
+      when 'lb','loadbalancer'
         recordname = "www.#{node.demo_name}" 
       else 
-        recordname = "#{node['server_role']}.#{node['demo_name']}"
+        recordname = "#{node['type']}.#{node['demo_name']}"
     end 
     
     public_ip = node.cloud.public_ipv4
     record =  dme.get(recordname)
 # If nil then create a new DNS entry.
-    if record.nil? ||  node.server_role == 'lb' then
+    if record.nil? ||  node.type == 'lb' then
       record = { :name => recordname, :data => public_ip, :type => 'A', :ttl => '120' }
       dme.create(record)
     else

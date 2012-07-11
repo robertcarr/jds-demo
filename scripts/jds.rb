@@ -6,7 +6,7 @@ require 'optparse'
 class JDS
   def initialize
     begin
-      puts "Retrieving metadata..."
+#      puts "Retrieving metadata..."
       @userid = ENV['JDS_USERID'] || '666'
       json = JSON.parse((`knife environment show jds --format json`).gsub('json_class','demo'))
       @config = json['default_attributes']['demos']
@@ -66,7 +66,19 @@ class JDS
     sleep 5 
   File.delete(fn)
   end
+    puts "Your demo is ready at http://www.#{meta['demo_name']}.jdsdemo.com"
+    puts "Monitoring is at http://monitoring.#{meta['demo_name']}.jdsdemo.com"
   end 
+ 
+  def running
+   @data = system("knife ec2 server list | egrep '(running|pending)'")
+  end
+  def killall
+   @data = system("knife ec2 server list | egrep '(running|pending)' | awk '{print $1;}'")
+  end
+  def kill(id)
+    system("knife ec2 server delete #{id} -P -y")
+  end
   
   def allinfo(demo)
     @config.each do |d|
@@ -76,15 +88,17 @@ class JDS
   end
 
 end # end class JDS
+if ARGV.length != 0 ; a = JDS.new ; end
 @opt = {}
-a = JDS.new
 @opts = OptionParser.new do |o|
 @opt[:dryrun] = false
 
   o.banner = "Usage: #{$0} [OPTIONS] <demo>"
   o.on("-h","--help","Help") { puts @opts }
+  o.on("--kill ID", "Kill instance <ID>") { |id| a.kill(id) }
   o.on("-l","--list","List available demos") { a.demos }
   o.on("-r","--roles DEMO","Show roles for a demo") { |role| puts a.roles(role) }
+  o.on("--running","Running instances") { a.running }
   o.on("-d","--dryrun","Displays execution steps without running them") { @opt[:dryrun] = true }
   o.on("-s","--start DEMO","Start the demo <DEMO>")  { |demo| a.run(demo) }
   o.on("-a","--allinfo DEMO","All metadata for demo DEMO") { |demo| puts a.allinfo(demo).to_json }

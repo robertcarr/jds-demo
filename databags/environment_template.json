@@ -10,7 +10,7 @@
                 "db_url": "http:test.test.com",
                 "app_url": "http://app.url",
                 "security_group": "default",
-                "ssh_key": "chef",
+               "ssh_key": "chef",
                 "image_id": "ami-35c31a5c",
                 "machine_size": "m1.large",
                 "login_user": "ubuntu",
@@ -19,36 +19,42 @@
                         "role": "monitoring",
                         "type": "monitoring",
                         "name": "collectd",
+                        "cloud" : "ec2",
                         "set_dns": "true"
                     },
                     {
                         "role": "wordpressdb",
                         "type": "db",
                         "name": "mysql",
+                        "cloud" : "ec2",
                         "set_dns": "true"
                     },
                     {
                         "role": "wordpress",
                         "type": "app",
                         "name": "wp",
+                        "cloud" : "ec2",
                         "set_dns": "false"
                     },
                     {
                         "role": "wordpress",
                         "type": "app",
                         "name": "wp",
+                        "cloud" : "ec2",
                         "set_dns": "false"
                     },
                     {
                         "role": "wordpress",
                         "type": "app",
                         "name": "wp",
+                        "cloud" : "ec2",
                         "set_dns": "false"
                     },
                     {
                         "role": "loadbalancer",
                         "type": "lb",
                         "name": "lb",
+                        "cloud" : "ec2",
                         "set_dns": "true"
                     }
                 ]
@@ -68,12 +74,14 @@
                         "role": "monitoring",
                         "type": "monitoring",
                         "name": "Server1",
+                        "cloud" : "ec2",
                         "set_dns": "true"
                     },
                     {
                         "role": "mysql",
                         "type": "db",
                         "name": "mysql",
+                        "cloud" : "ec2",
                         "set_dns": "true"
                     }
                 ]
@@ -94,20 +102,67 @@
                         "role": "monitoring",
                         "type": "monitoring",
                         "name": "Server1",
+                        "cloud" : "ec2",
                         "set_dns": "true"
                     },
                     {
                         "role": "memcache",
                         "type": "app",
                         "name": "memcache",
+                        "cloud" : "ec2",
                         "set_dns": "false"
                     }
+                ]
+            },
+  
+{
+                "demo_name": "apache",
+                "description": "2 Apache Servers with a Haproxy LB",
+                "db_url": "http:test.test.com",
+                "app_url": "http://app.url",
+                "security_group": "default",
+                "ssh_key": "chef",
+                "image_id": "ami-35c31a5c",
+                "machine_size": "m1.large",
+                "login_user": "ubuntu",
+                "roles": [
+                    {
+                        "role": "monitoring",
+                        "type": "monitoring",
+                        "name": "Server1",
+                        "cloud" : "ec2",
+                        "set_dns": "true"
+                    },
+                    {
+                        "role": "apache",
+                        "type": "app",
+                        "name": "apache",
+                        "cloud" : "ec2",
+                        "set_dns": "false"
+                    },
+ {
+                        "role": "apache",
+                        "type": "app",
+                        "name": "apache",
+                        "cloud" : "ec2",
+                        "set_dns": "false"
+                    },
+ {
+                        "role": "loadbalancer",
+                        "type": "lb",
+                        "name": "haproxy",
+                        "cloud" : "ec2",
+                        "set_dns": "true"
+                    }
+
+
+
                 ]
             }
 
 
 
 
+
         ]
-    }
-}
+    }}

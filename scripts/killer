@@ -1,0 +1,4 @@
+for i in `knife ec2 server list | egrep '(running|pending)' | awk '{print $1; }'`; do
+knife ec2 server delete $i -P -y
+done
+
