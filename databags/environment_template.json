@@ -6,54 +6,44 @@
         "demos": [
             {
                 "demo_name": "wordpress",
-                "description": "Three-tier Wordpress demo with monitoring, LB and Database",
+                "description": "Three-tier demo: 1 Monitoring, 1 DB, 1 Loadbalancer and 3 wordpress servers",
                 "db_url": "http:test.test.com",
                 "app_url": "http://app.url",
                 "security_group": "default",
                "ssh_key": "chef",
-                "image_id": "ami-35c31a5c",
+                "image_id": "ami-8fac75e6",
                 "machine_size": "m1.large",
                 "login_user": "ubuntu",
                 "roles": [
                     {
-                        "role": "monitoring",
-                        "type": "monitoring",
-                        "name": "collectd",
+                        "qty" : "1",
+                        "server_role": "monitoring",
+                        "server_type": "monitoring",
+                        "server_name": "collectd",
                         "cloud" : "ec2",
                         "set_dns": "true"
                     },
                     {
-                        "role": "wordpressdb",
-                        "type": "db",
-                        "name": "mysql",
+                        "qty" : "1",
+                        "server_role": "wordpressdb",
+                        "server_type": "db",
+                        "server_name": "mysql",
                         "cloud" : "ec2",
                         "set_dns": "true"
                     },
                     {
-                        "role": "wordpress",
-                        "type": "app",
-                        "name": "wp",
+                        "qty" : "3" ,
+                        "server_role": "wordpress",
+                        "server_type": "app",
+                        "server_name": "wp",
                         "cloud" : "ec2",
                         "set_dns": "false"
                     },
                     {
-                        "role": "wordpress",
-                        "type": "app",
-                        "name": "wp",
-                        "cloud" : "ec2",
-                        "set_dns": "false"
-                    },
-                    {
-                        "role": "wordpress",
-                        "type": "app",
-                        "name": "wp",
-                        "cloud" : "ec2",
-                        "set_dns": "false"
-                    },
-                    {
-                        "role": "loadbalancer",
-                        "type": "lb",
-                        "name": "lb",
+                        "qty" : "1",
+                        "server_role": "loadbalancer",
+                        "server_type": "lb",
+                        "server_name": "lb",
                         "cloud" : "ec2",
                         "set_dns": "true"
                     }
@@ -66,21 +56,23 @@
                 "app_url": "http://app.url",
                 "security_group": "default",
                 "ssh_key": "chef",
-                "image_id": "ami-35c31a5c",
+                "image_id": "ami-8fac75e6",
                 "machine_size": "m1.large",
                 "login_user": "ubuntu",
                 "roles": [
                     {
-                        "role": "monitoring",
-                        "type": "monitoring",
-                        "name": "Server1",
+                        "qty" : "1",
+                        "server_role": "monitoring",
+                        "server_type": "monitoring",
+                        "server_name": "Server1",
                         "cloud" : "ec2",
                         "set_dns": "true"
                     },
                     {
-                        "role": "mysql",
-                        "type": "db",
-                        "name": "mysql",
+                        "qty" : "1",
+                        "server_role": "mysql",
+                        "server_type": "db",
+                        "server_name": "mysql",
                         "cloud" : "ec2",
                         "set_dns": "true"
                     }
@@ -89,26 +81,28 @@
 
 {
                 "demo_name": "memcache",
-                "description": "standalone memcache server",
+                "description": "1 Collectd Server 2 memcache servers",
                 "db_url": "http:test.test.com",
                 "app_url": "http://app.url",
                 "security_group": "default",
                 "ssh_key": "chef",
-                "image_id": "ami-35c31a5c",
+                "image_id": "ami-8fac75e6",
                 "machine_size": "m1.large",
                 "login_user": "ubuntu",
                 "roles": [
                     {
-                        "role": "monitoring",
-                        "type": "monitoring",
-                        "name": "Server1",
+                        "qty" : "1",
+                        "server_role": "monitoring",
+                        "server_type": "monitoring",
+                        "server_name": "Server1",
                         "cloud" : "ec2",
                         "set_dns": "true"
                     },
                     {
-                        "role": "memcache",
-                        "type": "app",
-                        "name": "memcache",
+                        "qty" : "2",
+                        "server_role": "memcache",
+                        "server_type": "app",
+                        "server_name": "memcache",
                         "cloud" : "ec2",
                         "set_dns": "false"
                     }
@@ -117,40 +111,36 @@
   
 {
                 "demo_name": "apache",
-                "description": "2 Apache Servers with a Haproxy LB",
+                "description": "2 Apache Servers, 1 Haproxy LB, 1 Collectd Monitoring",
                 "db_url": "http:test.test.com",
                 "app_url": "http://app.url",
                 "security_group": "default",
                 "ssh_key": "chef",
-                "image_id": "ami-35c31a5c",
+                "image_id": "ami-8fac75e6",
                 "machine_size": "m1.large",
                 "login_user": "ubuntu",
                 "roles": [
                     {
-                        "role": "monitoring",
-                        "type": "monitoring",
-                        "name": "Server1",
+                        "qty" : "1",
+                        "server_role": "monitoring",
+                        "server_type": "monitoring",
+                        "server_name": "Server1",
                         "cloud" : "ec2",
                         "set_dns": "true"
                     },
                     {
-                        "role": "apache",
-                        "type": "app",
-                        "name": "apache",
+                        "qty" : "2",
+                        "server_role": "apache",
+                        "server_type": "app",
+                        "server_name": "apache",
                         "cloud" : "ec2",
                         "set_dns": "false"
                     },
- {
-                        "role": "apache",
-                        "type": "app",
-                        "name": "apache",
-                        "cloud" : "ec2",
-                        "set_dns": "false"
-                    },
- {
-                        "role": "loadbalancer",
-                        "type": "lb",
-                        "name": "haproxy",
+                    {
+                        "qty" : "1", 
+                        "server_role": "loadbalancer",
+                        "server_type": "lb",
+                        "server_name": "haproxy",
                         "cloud" : "ec2",
                         "set_dns": "true"
                     }

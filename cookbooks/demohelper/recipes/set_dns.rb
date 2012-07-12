@@ -40,7 +40,7 @@ hostname = ""
     end 
 #TODO(ROB): Need to make this OpenStack ready.
     public_ip = node.cloud.public_ipv4
-    recordname = "#{hostname}.#{node['demo_name']}" 
+    recordname = "#{hostname}.#{node['demo_name']}"
     record =  dme.get(recordname)
 # If nil then create a new DNS entry.
     if record.nil? ||  node.server_type == 'lb' then

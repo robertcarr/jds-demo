@@ -49,24 +49,29 @@ class JDS
     role
   end
   def run(demo)
+    begin
+    `knife data bag delete tenant_#{@userid}_#{demo} -y`
+    rescue
+    end
     meta = allinfo(demo)
-    puts "Attempting to start and configure: #{demo}"
+    puts "Running demo #{demo}.  This may take a bit."
     base = 'knife ec2 server create'
     r=roles(demo)
     r.each do |server|
+      puts "Starting #{server['qty']} #{server['server_role']}"
       fn = "/tmp/userdata_#{$$}.jds"
-      userdata = "demo_name=#{meta['demo_name']}&"
+      userdata = "demo_name=#{meta['demo_name']}&userid=#{@userid}&"
       userdata << server.collect { |k,v| "#{k}=#{v}" }.join("&")
-      cmd = base << " -x #{meta['login_user']} -S #{meta['ssh_key']} -G #{meta['security_group']} --image #{meta['image_id']} --flavor #{meta['machine_size']}"
-      cmd <<  "--user-data #{fn} --run-list role[#{server['server_role']}]"
+      cmd = base + " -x #{meta['login_user']} -S #{meta['ssh_key']} -G #{meta['security_group']} --image #{meta['image_id']} --flavor #{meta['machine_size']}"
+      cmd <<  " --user-data #{fn} --run-list role[#{server['server_role']}]"
       File.open(fn, 'w') { |f| f.write(userdata) }
-      if ENV['DEBUG'] ; cmd += ' &> /dev/null' ; end
-      puts userdata
-      #system(cmd)
+      cmd = "seq #{server['qty']} | parallel -n0 -j0 -v \"#{cmd}\""
+      `#{cmd}`
       sleep 5 
       File.delete(fn)
     end
-    puts "Your demo is ready at http://www.#{meta['demo_name']}.jdsdemo.com"
+    #puts "Your demo is ready at http://www.#{meta['demo_name']}.jdsdemo.com"
+    puts "Done!"
     puts "Monitoring is at http://monitoring.#{meta['demo_name']}.jdsdemo.com"
   end 
  
