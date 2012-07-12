@@ -49,6 +49,8 @@ class JDS
     role
   end
   def run(demo)
+  lb = false
+  db = false
     begin
     `knife data bag delete tenant_#{@userid}_#{demo} -y`
     rescue
@@ -58,6 +60,8 @@ class JDS
     base = 'knife ec2 server create'
     r=roles(demo)
     r.each do |server|
+    server['server_type'] == 'lb' ? lb = true : lb = false
+    server['server_type'] == 'db' ? db = true : db = false
       puts "Starting #{server['qty']} #{server['server_role']}"
       fn = "/tmp/userdata_#{$$}.jds"
       userdata = "demo_name=#{meta['demo_name']}&userid=#{@userid}&"
@@ -70,9 +74,12 @@ class JDS
       sleep 5 
       File.delete(fn)
     end
-    #puts "Your demo is ready at http://www.#{meta['demo_name']}.jdsdemo.com"
+    base_url = "#{meta['demo_name']}.jdsdemo.com"
     puts "Done!"
-    puts "Monitoring is at http://monitoring.#{meta['demo_name']}.jdsdemo.com"
+    puts "Your demo is ready at http://www.#{base_url}" if lb
+    puts "HAProxy Statistics at http://www.#{base_url}:22002/" if lb
+    puts "DB is at http://db.#{base_url}" if db
+    puts "Monitoring is at http://monitoring.#{base_url}"
   end 
  
   def running
