@@ -43,7 +43,7 @@ end
 
 # Save the databags with the updated information.
 unless customer_data.nil? || cloud_data.nil? 
-  cloud_data.merge!({'server_name' => config[:server_name], 'server_role'=>config[:server_role], 'launched' => Time.now })
+  cloud_data.merge!({'server_type' => config[:server_type],'server_name' => config[:server_name], 'server_role'=>config[:server_role], 'launched' => Time.now })
   customer_data['servers'] << cloud_data
   customer_data.save
 end
@@ -55,7 +55,8 @@ customer_data = data_bag_item(dbag_name, "demo")
 
 @nodeinfo = Hash.new{|h,k| h[k]=[] }
 customer_data['servers'].each do |server|
-    @nodeinfo[server['server_role']]  << server
+    @nodeinfo[server['server_type']]  << server
+    #@nodeinfo[server['server_role']]  << server
 end
 
 def attributes_by_role(role, attrib)
@@ -68,10 +69,10 @@ end
 
 # Create node attributes that will persist to the recipes that follow this one.  This makes it easier & faster for the other other recipes to know about their 
 # environment without having to query the chef server.
-%w[ demo_name server_role userid set_dns server_name type ].each { |x| node.set["#{x}"] = config[x.to_sym] }
+%w[ demo_name server_role userid set_dns server_name server_type ].each { |x| node.set["#{x}"] = config[x.to_sym] }
 
 @nodeinfo.each_key do |role|
-  %w[ private_ips public_ips name server_role public_hostname local_hostname server_name type ].each do |attrib|
+  %w[ private_ips public_ips server_name server_role public_hostname local_hostname server_type set_dns ].each do |attrib|
     node.set["#{role}"]["#{attrib}"] = attributes_by_role(role, attrib)
   end
 end

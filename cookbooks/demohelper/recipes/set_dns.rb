@@ -27,19 +27,23 @@ require 'dme-api'
 # Add/Upate DNS records to DNSMadeEasy as VM's start up.
 ruby_block "Update DNS" do
 block  do
+hostname = ""
   if node.set_dns == 'true'  then
     dme = DME.new(node[:dme][:apikey],node[:dme][:secretkey],node[:dme][:domain])
-    case node.type
+    case node.server_type
       when 'lb','loadbalancer'
-        recordname = "www.#{node.demo_name}" 
+        hostname = "www"
+      when 'db'
+        hostname = "db"
       else 
-        recordname = "#{node['type']}.#{node['demo_name']}"
+        hostname = "#{node['server_type']}"
     end 
-    
+#TODO(ROB): Need to make this OpenStack ready.
     public_ip = node.cloud.public_ipv4
+    recordname = "#{hostname}.#{node['demo_name']}" 
     record =  dme.get(recordname)
 # If nil then create a new DNS entry.
-    if record.nil? ||  node.type == 'lb' then
+    if record.nil? ||  node.server_type == 'lb' then
       record = { :name => recordname, :data => public_ip, :type => 'A', :ttl => '120' }
       dme.create(record)
     else
@@ -47,6 +51,7 @@ block  do
       dme.update(record['id'],record)
     end
   end
+
 end # block do
   action :create
 end # ruby_block

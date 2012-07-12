@@ -1,16 +1,19 @@
 #!/usr/bin/ruby
-
+#
+# jds.rb
+# Simple CLI to interact with the Cloudscaling JDS Demo system.
+#
+#
 require 'json'
 require 'optparse'
 
 class JDS
   def initialize
     begin
-#      puts "Retrieving metadata..."
+      puts "Retrieving metadata..."
       @userid = ENV['JDS_USERID'] || '666'
       json = JSON.parse((`knife environment show jds --format json`).gsub('json_class','demo'))
       @config = json['default_attributes']['demos']
-      
     rescue
       puts "Error loading environment data.  Is knife command installed?"
       exit
@@ -26,17 +29,12 @@ class JDS
   end
   def exists?(demo)
     @config.each do |d|
-      if d['demo_name'] == demo then
-        return true
-      end
+      d['demo_name'] == demo ? true  : false
     end
-    return false
   end
   def show(demo)
     @config.each do |d|
-      if d['demo_name'] == demo then
-       d.to_yaml
-      end
+      return d.to_yaml if d['demo_name'] == demo 
     end
   end
   def roles(demo)
@@ -51,21 +49,23 @@ class JDS
     role
   end
   def run(demo)
- meta = allinfo(demo)
-  r = roles(demo)
-  puts "Attempting to start and configure: #{demo}"
-  base = 'knife ec2 server create'
-  r.each do |server|
-    fn = "/tmp/userdata_#{$$}.jds"
-    userdata = "demo_name=#{meta['demo_name']}&server_role=#{server['role']}&userid=#{@userid}&set_dns=#{server['set_dns']}"
-    File.open(fn, 'w') { |f| f.write(userdata) }
-    cmd = base + " -x #{meta['login_user']} -S #{meta['ssh_key']} -G #{meta['security_group']} --image #{meta['image_id']} --flavor #{meta['machine_size']} " +
-              "--user-data #{fn} --run-list role[#{server['role']}]"
-    puts cmd
-    system(cmd)
-    sleep 5 
-  File.delete(fn)
-  end
+    meta = allinfo(demo)
+    puts "Attempting to start and configure: #{demo}"
+    base = 'knife ec2 server create'
+    r=roles(demo)
+    r.each do |server|
+      fn = "/tmp/userdata_#{$$}.jds"
+      userdata = "demo_name=#{meta['demo_name']}&"
+      userdata << server.collect { |k,v| "#{k}=#{v}" }.join("&")
+      cmd = base << " -x #{meta['login_user']} -S #{meta['ssh_key']} -G #{meta['security_group']} --image #{meta['image_id']} --flavor #{meta['machine_size']}"
+      cmd <<  "--user-data #{fn} --run-list role[#{server['server_role']}]"
+      File.open(fn, 'w') { |f| f.write(userdata) }
+      if ENV['DEBUG'] ; cmd += ' &> /dev/null' ; end
+      puts userdata
+      #system(cmd)
+      sleep 5 
+      File.delete(fn)
+    end
     puts "Your demo is ready at http://www.#{meta['demo_name']}.jdsdemo.com"
     puts "Monitoring is at http://monitoring.#{meta['demo_name']}.jdsdemo.com"
   end 
@@ -92,7 +92,6 @@ if ARGV.length != 0 ; a = JDS.new ; end
 @opt = {}
 @opts = OptionParser.new do |o|
 @opt[:dryrun] = false
-
   o.banner = "Usage: #{$0} [OPTIONS] <demo>"
   o.on("-h","--help","Help") { puts @opts }
   o.on("--kill ID", "Kill instance <ID>") { |id| a.kill(id) }
@@ -102,7 +101,6 @@ if ARGV.length != 0 ; a = JDS.new ; end
   o.on("-d","--dryrun","Displays execution steps without running them") { @opt[:dryrun] = true }
   o.on("-s","--start DEMO","Start the demo <DEMO>")  { |demo| a.run(demo) }
   o.on("-a","--allinfo DEMO","All metadata for demo DEMO") { |demo| puts a.allinfo(demo).to_json }
-    
 end
 
 @opts.parse! ARGV
